@@ -1,0 +1,20 @@
+{
+  "appTitle": "إيماني",
+  "lastRead": "آخر قراءة",
+  "continueText": "استمرار",
+  "locateQibla": "تحديد القبلة",
+  "findNearestMosque": "أقرب مسجد",
+  "dailyActivity": "النشاط اليومي",
+  "completeDailyActivity": "أكمل قائمة النشاط اليومي",
+  "goToChecklist": "اذهب إلى القائمة",
+  "home": "الرئيسية",
+  "discover": "استكشاف",
+  "quran": "القرآن",
+  "prayer": "الصلاة",
+  "profile": "الملف الشخصي",
+  "subuh": "صبح",
+  "fajr": "فجر",
+  "dzuhur": "ظهر",
+  "ashr": "عصر",
+  "maghrib": "مغرب"
+}

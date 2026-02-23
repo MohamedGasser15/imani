@@ -1,0 +1,20 @@
+{
+  "appTitle": "Imani",
+  "lastRead": "Last Read",
+  "continueText": "Continue",
+  "locateQibla": "Locate Qibla",
+  "findNearestMosque": "Find nearest Mosque",
+  "dailyActivity": "Daily Activity",
+  "completeDailyActivity": "Complete the daily activity checklist",
+  "goToChecklist": "Go to Checklist",
+  "home": "Home",
+  "discover": "Discover",
+  "quran": "Quran",
+  "prayer": "Prayer",
+  "profile": "Profile",
+  "subuh": "Subuh",
+  "fajr": "Fajr",
+  "dzuhur": "Dzuhur",
+  "ashr": "Ashr",
+  "maghrib": "Maghrib"
+}
