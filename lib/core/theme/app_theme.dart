@@ -2,41 +2,98 @@ import 'package:flutter/material.dart';
 import 'package:imani/core/constants/app_colors.dart';
 
 class AppTheme {
-  // ثيم مخصص للغة العربية (Tajawal)
-  static ThemeData get lightThemeArabic {
+  // ---- الثيم الفاتح للعربية ----
+  static ThemeData lightThemeArabic() {
     return ThemeData(
-      fontFamily: 'Tajawal', // الخط الافتراضي للتطبيق في العربية
-      scaffoldBackgroundColor: AppColors.white,
+      brightness: Brightness.light,
+      fontFamily: 'Tajawal',
+      scaffoldBackgroundColor: AppColors.lightBackground,
       colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
         secondary: AppColors.secondary,
+        surface: AppColors.lightSurface,
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
+        foregroundColor: AppColors.lightBackground,
       ),
-      textTheme: _arabicTextTheme, // تعريف TextTheme منفصل
+      textTheme: _arabicTextTheme,
     );
   }
 
-  // ثيم مخصص للغة الإنجليزية (Roboto)
-  static ThemeData get lightThemeEnglish {
+  // ---- الثيم الفاتح للإنجليزية ----
+  static ThemeData lightThemeEnglish() {
     return ThemeData(
+      brightness: Brightness.light,
       fontFamily: 'Roboto',
-      scaffoldBackgroundColor: AppColors.white,
+      scaffoldBackgroundColor: AppColors.lightBackground,
       colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
         secondary: AppColors.secondary,
+        surface: AppColors.lightSurface,
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
+        foregroundColor: AppColors.lightBackground,
       ),
       textTheme: _englishTextTheme,
     );
   }
 
-  // TextTheme للعربية (Tajawal)
+  // ---- الثيم الداكن للعربية ----
+  static ThemeData darkThemeArabic() {
+    return ThemeData(
+      brightness: Brightness.dark,
+      fontFamily: 'Tajawal',
+      scaffoldBackgroundColor: AppColors.darkBackground,
+      colorScheme: const ColorScheme.dark(
+        primary: AppColors.primary,
+        secondary: AppColors.secondary,
+        surface: AppColors.darkSurface,
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: AppColors.darkSurface,
+        foregroundColor: AppColors.darkText,
+      ),
+      textTheme: _arabicTextTheme.apply(
+        bodyColor: AppColors.darkText,
+        displayColor: AppColors.darkText,
+      ),
+    );
+  }
+
+  // ---- الثيم الداكن للإنجليزية ----
+  static ThemeData darkThemeEnglish() {
+    return ThemeData(
+      brightness: Brightness.dark,
+      fontFamily: 'Roboto',
+      scaffoldBackgroundColor: AppColors.darkBackground,
+      colorScheme: const ColorScheme.dark(
+        primary: AppColors.primary,
+        secondary: AppColors.secondary,
+        surface: AppColors.darkSurface,
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: AppColors.darkSurface,
+        foregroundColor: AppColors.darkText,
+      ),
+      textTheme: _englishTextTheme.apply(
+        bodyColor: AppColors.darkText,
+        displayColor: AppColors.darkText,
+      ),
+    );
+  }
+
+  // ---- دوال مساعدة لاختيار الثيم بناءً على اللغة والوضع ----
+  static ThemeData getTheme({required String languageCode, required Brightness brightness}) {
+    if (brightness == Brightness.light) {
+      return languageCode == 'ar' ? lightThemeArabic() : lightThemeEnglish();
+    } else {
+      return languageCode == 'ar' ? darkThemeArabic() : darkThemeEnglish();
+    }
+  }
+
+  // TextTheme للعربية (كما هي)
   static const TextTheme _arabicTextTheme = TextTheme(
     displayLarge: TextStyle(fontFamily: 'Tajawal', fontSize: 32, fontWeight: FontWeight.bold),
     displayMedium: TextStyle(fontFamily: 'Tajawal', fontSize: 28, fontWeight: FontWeight.bold),
@@ -49,7 +106,7 @@ class AppTheme {
     labelLarge: TextStyle(fontFamily: 'Tajawal', fontSize: 14, fontWeight: FontWeight.w500),
   );
 
-  // TextTheme للإنجليزية (Roboto)
+  // TextTheme للإنجليزية (كما هي)
   static const TextTheme _englishTextTheme = TextTheme(
     displayLarge: TextStyle(fontFamily: 'Roboto', fontSize: 32, fontWeight: FontWeight.bold),
     displayMedium: TextStyle(fontFamily: 'Roboto', fontSize: 28, fontWeight: FontWeight.bold),

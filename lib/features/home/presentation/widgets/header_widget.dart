@@ -7,24 +7,35 @@ class HeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+
+    // اختيار ألوان التدرج حسب الوضع
+    final List<Color> gradientColors = isLight
+        ? [AppColors.primary, AppColors.secondary]
+        : [AppColors.darkPrimary, AppColors.primary.withOpacity(0.7)];
+
+    // خفض شفافية صورة الخلفية في الوضع الليلي
+    final double imageOpacity = isLight ? 0.12 : 0.08;
+
     return Container(
       height: 340,
       child: Stack(
         fit: StackFit.expand,
         children: [
+          // الخلفية المتدرجة
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [AppColors.primary, AppColors.secondary],
+                colors: gradientColors,
               ),
             ),
           ),
-          // صورة المسجد (اختياري)
+          // صورة المسجد (خلفية زخرفية)
           Positioned.fill(
             child: Opacity(
-              opacity: 0.12,
+              opacity: imageOpacity,
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: Image.asset(
@@ -35,6 +46,7 @@ class HeaderWidget extends StatelessWidget {
               ),
             ),
           ),
+          // المحتوى
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
             child: Column(
@@ -85,7 +97,9 @@ class HeaderWidget extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
-                                color: AppColors.darkPrimary,
+                                color: isLight
+                                    ? AppColors.darkPrimary
+                                    : AppColors.darkPrimary.withOpacity(0.3),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: const Text(

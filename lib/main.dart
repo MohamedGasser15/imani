@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:imani/core/theme/app_theme.dart';
-import 'package:imani/features/splash/presentation/splash_screen.dart'; // تأكد من المسار الصحيح
+import 'package:imani/features/splash/presentation/splash_screen.dart';
 import 'package:imani/l10n/app_localizations.dart';
 
 void main() {
@@ -29,7 +29,15 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'إيماني',
       debugShowCheckedModeBanner: false,
-      theme: _buildTheme(_locale.languageCode),
+      theme: AppTheme.getTheme(
+        languageCode: _locale.languageCode,
+        brightness: Brightness.light,
+      ),
+      darkTheme: AppTheme.getTheme(
+        languageCode: _locale.languageCode,
+        brightness: Brightness.dark,
+      ),
+      themeMode: ThemeMode.system, // هيخد تفضيل الجهاز تلقائيًا
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -41,17 +49,7 @@ class _MyAppState extends State<MyApp> {
         Locale('en'),
       ],
       locale: _locale,
-      home: SplashScreen(onLocaleChange: _setLocale), // عرض Splash أولاً
+      home: SplashScreen(onLocaleChange: _setLocale),
     );
-  }
-
-  ThemeData _buildTheme(String languageCode) {
-    switch (languageCode) {
-      case 'ar':
-        return AppTheme.lightThemeArabic;
-      case 'en':
-      default:
-        return AppTheme.lightThemeEnglish;
-    }
   }
 }
