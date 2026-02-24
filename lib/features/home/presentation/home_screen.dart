@@ -40,7 +40,7 @@ class HomeScreen extends StatelessWidget {
           BottomNavigationBarItem(icon: const Icon(Icons.explore), label: t.discover),
           BottomNavigationBarItem(icon: const Icon(Icons.menu_book), label: t.quran),
           BottomNavigationBarItem(icon: const Icon(Icons.access_time), label: t.prayer),
-          BottomNavigationBarItem(icon: const Icon(Icons.person), label: t.profile),
+          BottomNavigationBarItem(icon: const Icon(Icons.settings), label: t.settings),
         ],
       ),
     );

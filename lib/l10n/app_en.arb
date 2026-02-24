@@ -1,5 +1,5 @@
 {
-  "appTitle": "Imani",
+  "appName": "Imani",
   "lastRead": "Last Read",
   "continueText": "Continue",
   "locateQibla": "Locate Qibla",
@@ -16,5 +16,6 @@
   "fajr": "Fajr",
   "dzuhur": "Dzuhur",
   "ashr": "Ashr",
-  "maghrib": "Maghrib"
+  "maghrib": "Maghrib",
+  "settings": "Settings"
 }

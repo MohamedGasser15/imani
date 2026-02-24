@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Imani';
+  String get appName => 'Imani';
 
   @override
   String get lastRead => 'Last Read';
@@ -61,4 +61,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get maghrib => 'Maghrib';
+
+  @override
+  String get settings => 'Settings';
 }

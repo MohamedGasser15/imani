@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:imani/core/constants/app_colors.dart';
 import 'package:imani/features/home/presentation/home_screen.dart';
+import 'package:imani/l10n/app_localizations.dart';
 
 class SplashScreen extends StatefulWidget {
   final void Function(Locale) onLocaleChange;
@@ -94,6 +95,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
       body: AnimatedBuilder(
         animation: _controller,
@@ -150,8 +152,8 @@ class _SplashScreenState extends State<SplashScreen>
                       // اسم التطبيق
                       Opacity(
                         opacity: _fadeInTitle.value,
-                        child: const Text(
-                          'إيماني',
+                        child: Text(
+                          t.appName,
                           style: TextStyle(
                             fontFamily: 'Tajawal',
                             fontSize: 48,

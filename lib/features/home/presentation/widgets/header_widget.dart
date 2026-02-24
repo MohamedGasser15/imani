@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:imani/core/constants/app_colors.dart';
 import 'package:imani/features/home/presentation/widgets/prayer_item.dart';
+import 'package:imani/l10n/app_localizations.dart';
 
 class HeaderWidget extends StatelessWidget {
   const HeaderWidget({super.key});
@@ -8,6 +9,7 @@ class HeaderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isLight = Theme.of(context).brightness == Brightness.light;
+    final t = AppLocalizations.of(context)!;
 
     // اختيار ألوان التدرج حسب الوضع
     final List<Color> gradientColors = isLight
@@ -119,11 +121,11 @@ class HeaderWidget extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        PrayerItem(name: 'Subuh', time: '04:37', icon: Icons.wb_twilight, isActive: false),
-                        PrayerItem(name: 'Fajr', time: '05:50', icon: Icons.wb_sunny, isActive: false),
-                        PrayerItem(name: 'Dzuhur', time: '12:05', icon: Icons.wb_sunny, isActive: false),
-                        PrayerItem(name: 'Ashr', time: '15:10', icon: Icons.wb_cloudy, isActive: true),
-                        PrayerItem(name: 'Maghrib', time: '18:13', icon: Icons.nightlight, isActive: false),
+                        PrayerItem(name: t.subuh, time: '04:37', icon: Icons.wb_twilight, isActive: false),
+                        PrayerItem(name: t.fajr, time: '05:50', icon: Icons.wb_sunny, isActive: false),
+                        PrayerItem(name: t.dzuhur, time: '12:05', icon: Icons.wb_sunny, isActive: false),
+                        PrayerItem(name: t.ashr, time: '15:10', icon: Icons.wb_cloudy, isActive: true),
+                        PrayerItem(name: t.maghrib, time: '18:13', icon: Icons.nightlight, isActive: false),
                       ],
                     ),
                   ],

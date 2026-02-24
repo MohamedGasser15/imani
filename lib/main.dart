@@ -37,7 +37,7 @@ class _MyAppState extends State<MyApp> {
         languageCode: _locale.languageCode,
         brightness: Brightness.dark,
       ),
-      themeMode: ThemeMode.system, // هيخد تفضيل الجهاز تلقائيًا
+      themeMode: ThemeMode.system,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

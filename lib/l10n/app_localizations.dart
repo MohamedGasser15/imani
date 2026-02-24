@@ -98,11 +98,11 @@ abstract class AppLocalizations {
     Locale('en'),
   ];
 
-  /// No description provided for @appTitle.
+  /// No description provided for @appName.
   ///
   /// In en, this message translates to:
   /// **'Imani'**
-  String get appTitle;
+  String get appName;
 
   /// No description provided for @lastRead.
   ///
@@ -205,6 +205,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Maghrib'**
   String get maghrib;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
 }
 
 class _AppLocalizationsDelegate

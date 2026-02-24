@@ -1,5 +1,5 @@
 {
-  "appTitle": "إيماني",
+  "appName": "إيماني",
   "lastRead": "آخر قراءة",
   "continueText": "استمرار",
   "locateQibla": "تحديد القبلة",
@@ -16,5 +16,6 @@
   "fajr": "فجر",
   "dzuhur": "ظهر",
   "ashr": "عصر",
-  "maghrib": "مغرب"
+  "maghrib": "مغرب",
+  "settings": "الإعدادات"
 }
