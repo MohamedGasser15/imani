@@ -106,4 +106,43 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get quranSettings => 'إعدادات القرآن';
+
+  @override
+  String get tasbih => 'سبحة';
+
+  @override
+  String get azkar => 'أذكار';
+
+  @override
+  String get dua => 'أدعية';
+
+  @override
+  String get mushaf => 'المصحف';
+
+  @override
+  String get prayer_times => 'مواقيت الصلاة';
+
+  @override
+  String get more => 'المزيد';
+
+  @override
+  String get qibla => 'القبلة';
+
+  @override
+  String get mosques => 'المساجد';
+
+  @override
+  String get events => 'المناسبات';
+
+  @override
+  String get calendar => 'التقويم';
+
+  @override
+  String get categories => 'التصنيفات';
+
+  @override
+  String get zakat => 'حساب الزكاة';
+
+  @override
+  String get ramadan_calendar => 'إمساكية رمضان';
 }

@@ -106,4 +106,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get quranSettings => 'Quran Settings';
+
+  @override
+  String get tasbih => 'Tasbih';
+
+  @override
+  String get azkar => 'Azkar';
+
+  @override
+  String get dua => 'Duas';
+
+  @override
+  String get mushaf => 'Mushaf';
+
+  @override
+  String get prayer_times => 'Prayer Times';
+
+  @override
+  String get more => 'More';
+
+  @override
+  String get qibla => 'Qibla';
+
+  @override
+  String get mosques => 'Mosques';
+
+  @override
+  String get events => 'Events';
+
+  @override
+  String get calendar => 'Calendar';
+
+  @override
+  String get categories => 'Categories';
+
+  @override
+  String get zakat => 'Zakat';
+
+  @override
+  String get ramadan_calendar => 'Ramadan Calendar';
 }

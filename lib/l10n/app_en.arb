@@ -31,5 +31,18 @@
       "language": "Language",
       "timeFormat": "Time Format",
       "notifications": "Notifications",
-       "quranSettings": "Quran Settings"
+       "quranSettings": "Quran Settings",
+         "tasbih": "Tasbih",
+  "azkar": "Azkar",
+  "dua": "Duas",
+    "mushaf": "Mushaf",
+  "prayer_times": "Prayer Times",
+  "more": "More",
+    "qibla": "Qibla",
+  "mosques": "Mosques",
+  "events": "Events",
+  "calendar": "Calendar",
+  "categories": "Categories",
+    "zakat": "Zakat",
+  "ramadan_calendar": "Ramadan Calendar"
 }

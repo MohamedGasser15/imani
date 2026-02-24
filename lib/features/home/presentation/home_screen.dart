@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:imani/features/home/presentation/widgets/categories_section.dart';
+import 'package:imani/features/home/presentation/widgets/category_buttons.dart';
 import 'package:imani/features/home/presentation/widgets/header_widget.dart';
 import 'package:imani/features/home/presentation/widgets/last_read_card.dart';
 import 'package:imani/core/constants/app_colors.dart';
@@ -59,18 +61,18 @@ class HomeContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          HeaderWidget(),
-          LastReadCard(),
-          SizedBox(height: 16),
-          // DailyActivityCard(),
-          SizedBox(height: 30),
-        ],
-      ),
-    );
+    // داخل HomeContent في build
+return SingleChildScrollView(
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: const [
+      HeaderWidget(),
+      LastReadCard(),
+      CategoriesSection(), // هنا القسم الجديد
+      SizedBox(height: 30),
+    ],
+  ),
+);
   }
 }
 

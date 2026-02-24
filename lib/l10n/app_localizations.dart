@@ -295,6 +295,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Quran Settings'**
   String get quranSettings;
+
+  /// No description provided for @tasbih.
+  ///
+  /// In en, this message translates to:
+  /// **'Tasbih'**
+  String get tasbih;
+
+  /// No description provided for @azkar.
+  ///
+  /// In en, this message translates to:
+  /// **'Azkar'**
+  String get azkar;
+
+  /// No description provided for @dua.
+  ///
+  /// In en, this message translates to:
+  /// **'Duas'**
+  String get dua;
+
+  /// No description provided for @mushaf.
+  ///
+  /// In en, this message translates to:
+  /// **'Mushaf'**
+  String get mushaf;
+
+  /// No description provided for @prayer_times.
+  ///
+  /// In en, this message translates to:
+  /// **'Prayer Times'**
+  String get prayer_times;
+
+  /// No description provided for @more.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get more;
+
+  /// No description provided for @qibla.
+  ///
+  /// In en, this message translates to:
+  /// **'Qibla'**
+  String get qibla;
+
+  /// No description provided for @mosques.
+  ///
+  /// In en, this message translates to:
+  /// **'Mosques'**
+  String get mosques;
+
+  /// No description provided for @events.
+  ///
+  /// In en, this message translates to:
+  /// **'Events'**
+  String get events;
+
+  /// No description provided for @calendar.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar'**
+  String get calendar;
+
+  /// No description provided for @categories.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get categories;
+
+  /// No description provided for @zakat.
+  ///
+  /// In en, this message translates to:
+  /// **'Zakat'**
+  String get zakat;
+
+  /// No description provided for @ramadan_calendar.
+  ///
+  /// In en, this message translates to:
+  /// **'Ramadan Calendar'**
+  String get ramadan_calendar;
 }
 
 class _AppLocalizationsDelegate

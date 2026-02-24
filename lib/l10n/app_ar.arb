@@ -31,5 +31,18 @@
   "language": "اللغة",
   "timeFormat": "تنسيق الساعة",
    "notifications": "الإشعارات",
-    "quranSettings": "إعدادات القرآن"
+    "quranSettings": "إعدادات القرآن",
+      "tasbih": "سبحة",
+  "azkar": "أذكار",
+  "dua": "أدعية",
+   "mushaf": "المصحف",
+  "prayer_times": "مواقيت الصلاة",
+  "more": "المزيد",
+    "qibla": "القبلة",
+  "mosques": "المساجد",
+  "events": "المناسبات",
+  "calendar": "التقويم",
+   "categories": "التصنيفات",
+   "zakat": "حساب الزكاة",
+  "ramadan_calendar": "إمساكية رمضان"
 }
