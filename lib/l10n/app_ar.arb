@@ -17,5 +17,19 @@
   "dzuhur": "ظهر",
   "ashr": "عصر",
   "maghrib": "مغرب",
-  "settings": "الإعدادات"
+  "settings": "الإعدادات",
+    "system": "تلقائي (حسب النظام)",
+  "light": "فاتح",
+  "dark": "داكن",
+  "arabic": "العربية",
+  "english": "English",
+  "twelveHour": "12 ساعة",
+  "twentyFourHour": "24 ساعة",
+  "adhanSound": "صوت الأذان",
+  "fontSize": "حجم الخط",
+   "appearance": "المظهر",
+  "language": "اللغة",
+  "timeFormat": "تنسيق الساعة",
+   "notifications": "الإشعارات",
+    "quranSettings": "إعدادات القرآن"
 }

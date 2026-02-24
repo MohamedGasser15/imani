@@ -64,4 +64,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings => 'Settings';
+
+  @override
+  String get system => 'System default';
+
+  @override
+  String get light => 'Light';
+
+  @override
+  String get dark => 'Dark';
+
+  @override
+  String get arabic => 'Arabic';
+
+  @override
+  String get english => 'English';
+
+  @override
+  String get twelveHour => '12 hour';
+
+  @override
+  String get twentyFourHour => '24 hour';
+
+  @override
+  String get adhanSound => 'Adhan sound';
+
+  @override
+  String get fontSize => 'Font size';
+
+  @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get timeFormat => 'Time Format';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get quranSettings => 'Quran Settings';
 }

@@ -4,13 +4,12 @@ import 'package:imani/features/home/presentation/home_screen.dart';
 import 'package:imani/l10n/app_localizations.dart';
 
 class SplashScreen extends StatefulWidget {
-  final void Function(Locale) onLocaleChange;
-
-  const SplashScreen({super.key, required this.onLocaleChange});
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
+
 
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
@@ -24,7 +23,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-
+    _navigateToHome();
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
@@ -78,7 +77,7 @@ class _SplashScreenState extends State<SplashScreen>
       context,
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => 
-            HomeScreen(onLocaleChange: widget.onLocaleChange),
+            const HomeScreen(), // بدون onLocaleChange
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(opacity: animation, child: child);
         },

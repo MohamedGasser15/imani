@@ -64,4 +64,46 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings => 'الإعدادات';
+
+  @override
+  String get system => 'تلقائي (حسب النظام)';
+
+  @override
+  String get light => 'فاتح';
+
+  @override
+  String get dark => 'داكن';
+
+  @override
+  String get arabic => 'العربية';
+
+  @override
+  String get english => 'English';
+
+  @override
+  String get twelveHour => '12 ساعة';
+
+  @override
+  String get twentyFourHour => '24 ساعة';
+
+  @override
+  String get adhanSound => 'صوت الأذان';
+
+  @override
+  String get fontSize => 'حجم الخط';
+
+  @override
+  String get appearance => 'المظهر';
+
+  @override
+  String get language => 'اللغة';
+
+  @override
+  String get timeFormat => 'تنسيق الساعة';
+
+  @override
+  String get notifications => 'الإشعارات';
+
+  @override
+  String get quranSettings => 'إعدادات القرآن';
 }

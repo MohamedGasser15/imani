@@ -17,5 +17,19 @@
   "dzuhur": "Dzuhur",
   "ashr": "Ashr",
   "maghrib": "Maghrib",
-  "settings": "Settings"
+  "settings": "Settings",
+    "system": "System default",
+  "light": "Light",
+  "dark": "Dark",
+  "arabic": "Arabic",
+  "english": "English",
+  "twelveHour": "12 hour",
+  "twentyFourHour": "24 hour",
+  "adhanSound": "Adhan sound",
+  "fontSize": "Font size",
+    "appearance": "Appearance",
+      "language": "Language",
+      "timeFormat": "Time Format",
+      "notifications": "Notifications",
+       "quranSettings": "Quran Settings"
 }

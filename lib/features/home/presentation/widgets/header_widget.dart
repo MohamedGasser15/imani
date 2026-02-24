@@ -1,15 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:imani/core/constants/app_colors.dart';
+import 'package:imani/core/providers/settings_provider.dart';
 import 'package:imani/features/home/presentation/widgets/prayer_item.dart';
+import 'package:imani/features/settings/presentation/screens/settings_screen.dart';
 import 'package:imani/l10n/app_localizations.dart';
 
 class HeaderWidget extends StatelessWidget {
   const HeaderWidget({super.key});
 
+  String _formatTime(DateTime time, TimeFormat format) {
+    if (format == TimeFormat.twelveHour) {
+      return DateFormat('h:mm a').format(time);
+    } else {
+      return DateFormat('HH:mm').format(time);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isLight = Theme.of(context).brightness == Brightness.light;
     final t = AppLocalizations.of(context)!;
+    final settings = Provider.of<SettingsProvider>(context);
+    final now = DateTime.now();
+    final formattedTime = _formatTime(now, settings.timeFormat);
+    final timeUntilNextPrayer = "01:08:59"; // مؤقت، سيتم تحديثه لاحقاً
 
     // اختيار ألوان التدرج حسب الوضع
     final List<Color> gradientColors = isLight
@@ -65,18 +81,18 @@ class HeaderWidget extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(height: 15),
-                            const Text(
-                              '14:01',
-                              style: TextStyle(
+                            Text(
+                              formattedTime,
+                              style: const TextStyle(
                                 fontSize: 42,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
                             ),
                             const SizedBox(height: 4),
-                            const Text(
-                              '☉ Ashr in 01:08:59',
-                              style: TextStyle(
+                            Text(
+                              '☉ Ashr in $timeUntilNextPrayer',
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
@@ -87,6 +103,19 @@ class HeaderWidget extends StatelessWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
+                            // أيقونة الإعدادات فوق التاريخ
+                            IconButton(
+                              icon: const Icon(Icons.settings, color: Colors.white, size: 28),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                                );
+                              },
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                            const SizedBox(height: 4),
                             Text(
                               '10 Ramadhan 1446 H',
                               style: TextStyle(

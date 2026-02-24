@@ -1,43 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
+import 'package:imani/core/providers/settings_provider.dart';
 import 'package:imani/core/theme/app_theme.dart';
 import 'package:imani/features/splash/presentation/splash_screen.dart';
 import 'package:imani/l10n/app_localizations.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => SettingsProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  Locale _locale = const Locale('ar');
-
-  void _setLocale(Locale newLocale) {
-    setState(() {
-      _locale = newLocale;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final settings = Provider.of<SettingsProvider>(context);
     return MaterialApp(
       title: 'إيماني',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.getTheme(
-        languageCode: _locale.languageCode,
+        languageCode: settings.locale.languageCode,
         brightness: Brightness.light,
       ),
       darkTheme: AppTheme.getTheme(
-        languageCode: _locale.languageCode,
+        languageCode: settings.locale.languageCode,
         brightness: Brightness.dark,
       ),
-      themeMode: ThemeMode.system,
+      themeMode: settings.themeMode,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -48,8 +43,8 @@ class _MyAppState extends State<MyApp> {
         Locale('ar'),
         Locale('en'),
       ],
-      locale: _locale,
-      home: SplashScreen(onLocaleChange: _setLocale),
+      locale: settings.locale,
+      home: const SplashScreen(),
     );
   }
 }
