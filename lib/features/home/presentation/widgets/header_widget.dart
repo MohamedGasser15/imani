@@ -75,8 +75,8 @@ class HeaderWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        // العمود الأيسر (الوقت)
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -100,48 +100,60 @@ class HeaderWidget extends StatelessWidget {
                             ),
                           ],
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            // أيقونة الإعدادات فوق التاريخ
-                            IconButton(
-                              icon: const Icon(Icons.settings, color: Colors.white, size: 28),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (_) => const SettingsScreen()),
-                                );
-                              },
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '10 Ramadhan 1446 H',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white.withOpacity(0.9),
+                        const Spacer(), // يدفع العمود الثاني للنهاية
+                        // العمود الأيمن (التاريخ والإعدادات) - باستخدام Expanded لمنع overflow
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              // أيقونة الإعدادات
+                              IconButton(
+                                icon: const Icon(Icons.settings, color: Colors.white, size: 28),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                                  );
+                                },
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
                               ),
-                            ),
-                            const SizedBox(height: 2),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: isLight
-                                    ? AppColors.darkPrimary
-                                    : AppColors.darkPrimary.withOpacity(0.3),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: const Text(
-                                '☉ Sumedang, West Ja...',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: AppColors.secondary,
+                              const SizedBox(height: 4),
+                              // التاريخ - مع FittedBox لضبط الطول
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  '10 Ramadhan 1446 H',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white.withOpacity(0.9),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 2),
+                              // المكان - داخل Container مع FittedBox
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: isLight
+                                      ? AppColors.darkPrimary
+                                      : AppColors.darkPrimary.withOpacity(0.3),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    '☉ Sumedang, West Ja...',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: AppColors.secondary,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),

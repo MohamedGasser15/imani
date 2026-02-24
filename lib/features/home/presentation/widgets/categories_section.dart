@@ -43,7 +43,6 @@ final List<CategoryItem> categories = [
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // العنوان المحسن
               Row(
                 children: [
                   Container(
@@ -69,16 +68,14 @@ final List<CategoryItem> categories = [
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
 
-              // الأزرار في grid - ضبط childAspectRatio
               GridView.count(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 crossAxisCount: 4,
                 mainAxisSpacing: 16,
                 crossAxisSpacing: 16,
-                childAspectRatio: 0.87, // تم التعديل ليتناسب مع المحتوى
+                childAspectRatio: 0.8,
                 children: categories.map((cat) => _buildCategoryItem(context, cat)).toList(),
               ),
             ],
