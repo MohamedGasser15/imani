@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:imani/features/home/presentation/widgets/categories_section.dart';
-import 'package:imani/features/home/presentation/widgets/category_buttons.dart';
 import 'package:imani/features/home/presentation/widgets/header_widget.dart';
 import 'package:imani/features/home/presentation/widgets/last_read_card.dart';
-import 'package:imani/core/constants/app_colors.dart';
+import 'package:imani/features/home/presentation/widgets/categories_section.dart';
+import 'package:imani/features/quran/presentation/screens/quran_page_screen.dart'; // استيراد الشاشة الجديدة
+import 'package:imani/features/quran/presentation/screens/surah_list_screen.dart';
 import 'package:imani/l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,27 +16,25 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
-  // صفحات التاب (الآن 5 صفحات: الرئيسية، استكشاف، القرآن، الصلاة، الملف الشخصي)
-  final List<Widget> _pages = const [
-    HomeContent(),
-    DiscoverScreenPlaceholder(),
-    QuranScreenPlaceholder(),
-    PrayerScreenPlaceholder(),
-    ProfileScreenPlaceholder(), // الصفحة الخامسة هي البروفايل
+  late final List<Widget> _pages = [
+    const HomeTab(),
+    const DiscoverTab(),
+    const QuranTab(), // هذا التبويب يستخدم QuranPageScreen
+    const PrayerTab(),
+    const ProfileTab(),
   ];
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
+
     return Scaffold(
-      body: _pages[_selectedIndex],
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        selectedItemColor: AppColors.secondary,
-        unselectedItemColor: AppColors.textLight,
-        selectedLabelStyle: const TextStyle(fontSize: 12),
-        unselectedLabelStyle: const TextStyle(fontSize: 12),
         currentIndex: _selectedIndex,
         onTap: (index) {
           setState(() {
@@ -55,57 +53,57 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// المحتوى الرئيسي للصفحة الرئيسية
-class HomeContent extends StatelessWidget {
-  const HomeContent({super.key});
+class HomeTab extends StatelessWidget {
+  const HomeTab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // داخل HomeContent في build
-return SingleChildScrollView(
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: const [
-      HeaderWidget(),
-      LastReadCard(),
-      CategoriesSection(), // هنا القسم الجديد
-      SizedBox(height: 30),
-    ],
-  ),
-);
+    return const SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          HeaderWidget(),
+          LastReadCard(),
+          CategoriesSection(),
+          SizedBox(height: 30),
+        ],
+      ),
+    );
   }
 }
 
-// صفحات مؤقتة للتبويبات الأخرى
-class DiscoverScreenPlaceholder extends StatelessWidget {
-  const DiscoverScreenPlaceholder({super.key});
+class DiscoverTab extends StatelessWidget {
+  const DiscoverTab({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Discover Page'));
+    return const Center(child: Text('قريباً...'));
   }
 }
 
-class QuranScreenPlaceholder extends StatelessWidget {
-  const QuranScreenPlaceholder({super.key});
+class QuranTab extends StatelessWidget {
+  const QuranTab({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Quran Page'));
+    return const SurahListScreen(); // هنا الشاشة الجديدة
   }
 }
 
-class PrayerScreenPlaceholder extends StatelessWidget {
-  const PrayerScreenPlaceholder({super.key});
+class PrayerTab extends StatelessWidget {
+  const PrayerTab({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Prayer Page'));
+    return const Center(child: Text('قريباً...'));
   }
 }
 
-// صفحة الملف الشخصي (مؤقتة)
-class ProfileScreenPlaceholder extends StatelessWidget {
-  const ProfileScreenPlaceholder({super.key});
+class ProfileTab extends StatelessWidget {
+  const ProfileTab({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Profile Page'));
+    return const Center(child: Text('قريباً...'));
   }
 }

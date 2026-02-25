@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:imani/core/constants/app_colors.dart';
 import 'package:imani/features/home/presentation/home_screen.dart';
+import 'package:imani/features/quran/providers/quran_provider.dart';
 import 'package:imani/l10n/app_localizations.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -9,7 +11,6 @@ class SplashScreen extends StatefulWidget {
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
-
 
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
@@ -23,13 +24,11 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    _navigateToHome();
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
     );
 
-    // أنيميشن اللوجو: تظهر مع تكبير ودوران بسيط
     _fadeInIcon = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
@@ -42,14 +41,13 @@ class _SplashScreenState extends State<SplashScreen>
         curve: const Interval(0.0, 0.5, curve: Curves.elasticOut),
       ),
     );
-    _rotateIcon = Tween<double>(begin: -0.2, end: 0.0).animate( // دوران بسيط هادئ
+    _rotateIcon = Tween<double>(begin: -0.2, end: 0.0).animate(
       CurvedAnimation(
         parent: _controller,
         curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
       ),
     );
 
-    // أنيميشن العنوان
     _fadeInTitle = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
@@ -57,7 +55,6 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
 
-    // أنيميشن الآية
     _fadeInAyah = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
@@ -66,18 +63,20 @@ class _SplashScreenState extends State<SplashScreen>
     );
 
     _controller.forward();
-
     _navigateToHome();
   }
 
   void _navigateToHome() async {
     await Future.delayed(const Duration(seconds: 4));
     if (!mounted) return;
+
+    final quranProvider = Provider.of<QuranProvider>(context, listen: false);
+    quranProvider.preload(); // لا ننتظر، يتم في الخلفية
+
     Navigator.pushReplacement(
       context,
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => 
-            const HomeScreen(), // بدون onLocaleChange
+        pageBuilder: (context, animation, secondaryAnimation) => const HomeScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(opacity: animation, child: child);
         },
@@ -104,7 +103,7 @@ class _SplashScreenState extends State<SplashScreen>
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [AppColors.primary, Color(0xFF143F24)], // تدرج إسلامي عميق
+                colors: [AppColors.primary, Color(0xFF143F24)],
               ),
             ),
             child: Stack(
@@ -114,7 +113,6 @@ class _SplashScreenState extends State<SplashScreen>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // اللوجو الجديد مع التأثيرات
                       Opacity(
                         opacity: _fadeInIcon.value,
                         child: Transform.scale(
@@ -122,7 +120,7 @@ class _SplashScreenState extends State<SplashScreen>
                           child: Transform.rotate(
                             angle: _rotateIcon.value * 3.14,
                             child: Container(
-                              width: 180, // حجم مناسب للوجو
+                              width: 180,
                               height: 180,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
@@ -135,20 +133,16 @@ class _SplashScreenState extends State<SplashScreen>
                                 ],
                               ),
                               child: ClipOval(
-                               child: Image.asset(
-  'assets/images/Splash.png',
-  width: 100,   // عشان تصغر العرض
-  height: 100,  // عشان تصغر الطول
-  fit: BoxFit.cover,
-),
+                                child: Image.asset(
+                                  'assets/images/Splash.png',
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
                       const SizedBox(height: 40),
-
-                      // اسم التطبيق
                       Opacity(
                         opacity: _fadeInTitle.value,
                         child: Text(
@@ -166,8 +160,6 @@ class _SplashScreenState extends State<SplashScreen>
                         ),
                       ),
                       const SizedBox(height: 20),
-
-                      // الآية الكريمة
                       Opacity(
                         opacity: _fadeInAyah.value,
                         child: const Padding(

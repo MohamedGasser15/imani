@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:imani/core/providers/settings_provider.dart';
+import 'package:imani/features/quran/providers/quran_provider.dart';
 import 'package:imani/core/theme/app_theme.dart';
 import 'package:imani/features/splash/presentation/splash_screen.dart';
 import 'package:imani/l10n/app_localizations.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => SettingsProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => SettingsProvider()),
+        ChangeNotifierProvider(create: (_) => QuranProvider()),
+      ],
       child: const MyApp(),
     ),
   );
