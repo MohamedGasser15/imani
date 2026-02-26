@@ -3,6 +3,7 @@ import 'package:imani/features/home/presentation/widgets/header_widget.dart';
 import 'package:imani/features/home/presentation/widgets/last_read_card.dart';
 import 'package:imani/features/home/presentation/widgets/categories_section.dart';
 import 'package:imani/features/quran/presentation/screens/quran_page_screen.dart'; // استيراد الشاشة الجديدة
+import 'package:imani/features/quran/presentation/screens/QuranPageViewScreen.dart';
 import 'package:imani/features/quran/presentation/screens/surah_list_screen.dart';
 import 'package:imani/l10n/app_localizations.dart';
 
@@ -33,7 +34,10 @@ class _HomeScreenState extends State<HomeScreen> {
         index: _selectedIndex,
         children: _pages,
       ),
-      bottomNavigationBar: BottomNavigationBar(
+     // داخل HomeScreen، في build:
+bottomNavigationBar: _selectedIndex == 2 
+    ? null // إخفاء الشريط في تبويب القرآن
+    : BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
         onTap: (index) {
@@ -81,15 +85,15 @@ class DiscoverTab extends StatelessWidget {
   }
 }
 
+// داخل class QuranTab في home_screen.dart
 class QuranTab extends StatelessWidget {
   const QuranTab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const SurahListScreen(); // هنا الشاشة الجديدة
+    return const QuranPageViewScreen(); // استبدال SurahListScreen
   }
 }
-
 class PrayerTab extends StatelessWidget {
   const PrayerTab({super.key});
 
