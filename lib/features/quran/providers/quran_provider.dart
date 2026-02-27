@@ -6,32 +6,39 @@ import 'package:imani/core/repositories/quran_repository.dart';
 class QuranProvider extends ChangeNotifier {
   final QuranRepository _repository = QuranRepository();
 
-  List<Surah> _surahs = [];
-  bool _isLoading = false;
-  String? _error;
-  double _progress = 0.0;
-
-  Map<int, List<Ayah>> _pagesMap = {};
-  int _totalPages = 0;
   int _lastReadPage = 1;
+  List<Ayah>? _currentPageAyahs;
+  bool _isLoadingPage = false;
+  String? _error;
+  final int _totalPages = 604; // عدد صفحات المصحف ثابت
 
-  List<Surah> get surahs => _surahs;
-  bool get isLoading => _isLoading;
-  String? get error => _error;
-  double get progress => _progress;
-  Map<int, List<Ayah>> get pagesMap => _pagesMap;
-  int get totalPages => _totalPages;
+  // Getters
   int get lastReadPage => _lastReadPage;
+  List<Ayah>? get currentPageAyahs => _currentPageAyahs;
+  bool get isLoadingPage => _isLoadingPage;
+  String? get error => _error;
+  int get totalPages => _totalPages;
 
   QuranProvider() {
-    _loadLastPage();
-    loadSurahs();
+    _init();
+  }
+
+  // دالة تهيئة عامة (تُستدعى من SplashScreen)
+  Future<void> initialize() async {
+    // إذا كانت الصفحة الحالية محملة بالفعل، لا تفعل شيئاً
+    if (_currentPageAyahs != null) return;
+    await _init();
+  }
+
+  Future<void> _init() async {
+    await _loadLastPage();
+    await loadPage(_lastReadPage);
+    _repository.startBackgroundLoading(_lastReadPage);
   }
 
   Future<void> _loadLastPage() async {
     final prefs = await SharedPreferences.getInstance();
     _lastReadPage = prefs.getInt('lastReadPage') ?? 1;
-    notifyListeners();
   }
 
   Future<void> saveLastPage(int page) async {
@@ -39,72 +46,48 @@ class QuranProvider extends ChangeNotifier {
     _lastReadPage = page;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('lastReadPage', page);
-    notifyListeners();
   }
 
-  Future<void> loadSurahs() async {
-    _isLoading = true;
+  Future<void> loadPage(int pageNumber) async {
+    if (pageNumber < 1 || pageNumber > _totalPages) return;
+
+    _isLoadingPage = true;
     _error = null;
     notifyListeners();
 
     try {
-      _surahs = await _repository.getSurahs();
-    } catch (e) {
-      _error = e.toString();
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  Future<void> buildPagesMap() async {
-    try {
-      final allAyahs = await _repository.getAllAyahs();
-      _pagesMap = {};
-      for (var ayah in allAyahs) {
-        if (!_pagesMap.containsKey(ayah.page)) {
-          _pagesMap[ayah.page] = [];
-        }
-        _pagesMap[ayah.page]!.add(ayah);
+      _currentPageAyahs = await _repository.getPage(pageNumber);
+      if (pageNumber != _lastReadPage) {
+        await saveLastPage(pageNumber);
       }
-      _totalPages = _pagesMap.length;
-      notifyListeners();
     } catch (e) {
       _error = e.toString();
-      notifyListeners();
-    }
-  }
-
-  Future<List<Ayah>> getPage(int pageNumber) async {
-    try {
-      return await _repository.getAyahsByPage(pageNumber);
-    } catch (e) {
-      _error = e.toString();
-      return [];
-    }
-  }
-
-  Future<void> preload() async {
-    _isLoading = true;
-    _progress = 0.1;
-    notifyListeners();
-
-    try {
-      await _repository.preloadQuran();
-      _progress = 0.9;
-      notifyListeners();
-      await loadSurahs();
-      await buildPagesMap();
-      _progress = 1.0;
-    } catch (e) {
-      _error = e.toString();
+      _currentPageAyahs = null;
     } finally {
-      _isLoading = false;
+      _isLoadingPage = false;
       notifyListeners();
     }
   }
-Future<List<Ayah>> getAllAyahs() => _repository.getAllAyahs();
+
+  Future<void> goToPage(int pageNumber) async {
+    if (pageNumber < 1 || pageNumber > _totalPages) return;
+    await loadPage(pageNumber);
+    _repository.startBackgroundLoading(pageNumber);
+  }
+
+  Future<List<Ayah>> getPage(int pageNumber) {
+    return _repository.getPage(pageNumber);
+  }
+
   Future<List<Ayah>> getAyahsForSurah(int surahNumber) {
     return _repository.getAyahs(surahNumber);
+  }
+
+  Future<List<Surah>> getSurahs() => _repository.getSurahs();
+
+  @override
+  void dispose() {
+    _repository.stopBackgroundLoading();
+    super.dispose();
   }
 }

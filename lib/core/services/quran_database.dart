@@ -53,24 +53,69 @@ class QuranDatabase {
     // إنشاء فهرس على page لتسريع الاستعلامات
     await db.execute('CREATE INDEX idx_page ON ayahs(page)');
   }
+  Future<Surah?> getSurahIfExists(int surahNumber) async {
+  final db = await database;
+  final List<Map<String, dynamic>> maps = await db.query(
+    'surahs',
+    where: 'number = ?',
+    whereArgs: [surahNumber],
+    limit: 1,
+  );
+  if (maps.isEmpty) return null;
+  return Surah(
+    number: maps[0]['number'],
+    name: maps[0]['name'],
+    englishName: maps[0]['englishName'],
+    englishNameTranslation: maps[0]['englishNameTranslation'],
+    revelationType: maps[0]['revelationType'],
+    numberOfAyahs: maps[0]['numberOfAyahs'],
+    ayahs: [],
+  );
+}
 
-  Future<void> insertFullQuran(List<Surah> surahs) async {
-    final db = await database;
-    await db.transaction((txn) async {
-      await txn.delete('ayahs');
-      await txn.delete('surahs');
-
-      for (var surah in surahs) {
-        await txn.insert('surahs', surah.toMap());
-      }
-
-      for (var surah in surahs) {
-        for (var ayah in surah.ayahs) {
-          await txn.insert('ayahs', ayah.toMap());
-        }
-      }
-    });
+Future<void> insertSurah(Surah surah) async {
+  final db = await database;
+  final existing = await db.query(
+    'surahs',
+    where: 'number = ?',
+    whereArgs: [surah.number],
+    limit: 1,
+  );
+  if (existing.isEmpty) {
+    await db.insert('surahs', surah.toMap());
   }
+}
+
+Future<void> insertAyahs(List<Ayah> ayahs) async {
+  final db = await database;
+  final batch = db.batch();
+  for (var ayah in ayahs) {
+    batch.insert('ayahs', ayah.toMap());
+  }
+  await batch.commit(noResult: true);
+}
+
+Future<void> clearAllData() async {
+  final db = await database;
+  await db.delete('ayahs');
+  await db.delete('surahs');
+}
+
+Future<void> insertFullQuran(List<Surah> surahs, List<Ayah> ayahs) async {
+  final db = await database;
+  await db.transaction((txn) async {
+    await txn.delete('ayahs');
+    await txn.delete('surahs');
+
+    for (var surah in surahs) {
+      await txn.insert('surahs', surah.toMap());
+    }
+
+    for (var ayah in ayahs) {
+      await txn.insert('ayahs', ayah.toMap());
+    }
+  });
+}
 
   Future<List<Surah>> getSurahs() async {
     final db = await database;

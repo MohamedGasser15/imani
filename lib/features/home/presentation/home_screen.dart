@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:imani/features/home/presentation/widgets/header_widget.dart';
 import 'package:imani/features/home/presentation/widgets/last_read_card.dart';
 import 'package:imani/features/home/presentation/widgets/categories_section.dart';
-import 'package:imani/features/quran/presentation/screens/quran_page_screen.dart'; // استيراد الشاشة الجديدة
 import 'package:imani/features/quran/presentation/screens/QuranPageViewScreen.dart';
-import 'package:imani/features/quran/presentation/screens/surah_list_screen.dart';
 import 'package:imani/l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {

@@ -16,10 +16,8 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeInIcon;
-  late Animation<double> _rotateIcon;
   late Animation<double> _scaleIcon;
-  late Animation<double> _fadeInTitle;
-  late Animation<double> _fadeInAyah;
+  late Animation<double> _fadeInText;
 
   @override
   void initState() {
@@ -30,48 +28,37 @@ class _SplashScreenState extends State<SplashScreen>
     );
 
     _fadeInIcon = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.4, curve: Curves.easeOut),
-      ),
+      CurvedAnimation(parent: _controller, curve: const Interval(0.0, 0.5, curve: Curves.easeIn)),
     );
-    _scaleIcon = Tween<double>(begin: 0.5, end: 1.0).animate(
+
+    _scaleIcon = Tween<double>(begin: 0.8, end: 1.0).animate(
       CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.5, curve: Curves.elasticOut),
-      ),
-    );
-    _rotateIcon = Tween<double>(begin: -0.2, end: 0.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+        parent: _controller, 
+        curve: const Interval(0.0, 0.5, curve: Curves.easeOutBack),
       ),
     );
 
-    _fadeInTitle = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.3, 0.8, curve: Curves.easeIn),
-      ),
-    );
-
-    _fadeInAyah = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.6, 1.0, curve: Curves.easeIn),
-      ),
+    _fadeInText = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: const Interval(0.4, 0.9, curve: Curves.easeIn)),
     );
 
     _controller.forward();
-    _navigateToHome();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _navigateToHome();
+    });
   }
 
   void _navigateToHome() async {
-    await Future.delayed(const Duration(seconds: 4));
-    if (!mounted) return;
+    final animationDuration = _controller.duration!;
 
-    final quranProvider = Provider.of<QuranProvider>(context, listen: false);
-    quranProvider.preload(); // لا ننتظر، يتم في الخلفية
+    // ننتظر انتهاء الأنيميشن وتهيئة QuranProvider (تحميل الصفحة الأولى فقط)
+    await Future.wait([
+      Future.delayed(animationDuration + const Duration(milliseconds: 500)),
+      Provider.of<QuranProvider>(context, listen: false).initialize(), // ✅ استخدام initialize بدلاً من preload
+    ]);
+
+    if (!mounted) return;
 
     Navigator.pushReplacement(
       context,
@@ -93,120 +80,132 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context)!;
     return Scaffold(
-      body: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [AppColors.primary, Color(0xFF143F24)],
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF1E3A5F),
+              Color(0xFF2D6A4F),
+            ],
+          ),
+        ),
+        child: Stack(
+          children: [
+            Opacity(
+              opacity: 0.05,
+              child: Container(
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/images/pattern.png'),
+                    repeat: ImageRepeat.repeat,
+                  ),
+                ),
               ),
             ),
-            child: Stack(
-              children: [
-                ..._buildBackgroundCircles(),
-                Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Opacity(
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AnimatedBuilder(
+                    animation: _controller,
+                    builder: (context, child) {
+                      return Opacity(
                         opacity: _fadeInIcon.value,
                         child: Transform.scale(
                           scale: _scaleIcon.value,
-                          child: Transform.rotate(
-                            angle: _rotateIcon.value * 3.14,
-                            child: Container(
-                              width: 180,
-                              height: 180,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.white.withOpacity(0.2),
-                                    blurRadius: 40,
-                                    spreadRadius: 5,
-                                  ),
-                                ],
-                              ),
-                              child: ClipOval(
+                          child: Container(
+                            width: 180,
+                            height: 180,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: const Color(0xFFD4AF37), width: 3),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.3),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
+                            ),
+                            child: ClipOval(
+                              child: Padding(
+                                padding: const EdgeInsets.all(25.0),
                                 child: Image.asset(
-                                  'assets/images/Splash.png',
-                                  fit: BoxFit.cover,
+                                  'assets/images/Splash.png', 
+                                  fit: BoxFit.contain,
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 40),
-                      Opacity(
-                        opacity: _fadeInTitle.value,
-                        child: Text(
-                          t.appName,
-                          style: TextStyle(
-                            fontFamily: 'Tajawal',
-                            fontSize: 48,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            letterSpacing: 2.0,
-                            shadows: [
-                              Shadow(color: Colors.black26, offset: Offset(2, 2), blurRadius: 4),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Opacity(
-                        opacity: _fadeInAyah.value,
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 40),
-                          child: Text(
-                            'إِنَّمَا الْمُؤْمِنُونَ إِخْوَةٌ',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontFamily: 'Scheherazade',
-                              fontSize: 26,
-                              color: Colors.white70,
-                              fontWeight: FontWeight.w500,
-                              height: 1.5,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                      );
+                    },
                   ),
-                ),
-              ],
+                  const SizedBox(height: 30),
+                  FadeTransition(
+                    opacity: _fadeInText,
+                    child: const Text(
+                      'إيماني',
+                      style: TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 42,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  FadeTransition(
+                    opacity: _fadeInText,
+                    child: const Text(
+                      'إِنَّمَا الْمُؤْمِنُونَ إِخْوَةٌ',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Scheherazade',
+                        fontSize: 26,
+                        color: Colors.white70,
+                        fontWeight: FontWeight.w500,
+                        height: 1.5,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  FadeTransition(
+                    opacity: _fadeInText,
+                    child: Column(
+                      children: [
+                        const SizedBox(
+                          width: 30,
+                          height: 30,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFD4AF37)),
+                          ),
+                        ),
+                        const SizedBox(height: 15),
+                        Text(
+                          'جاري تحميل إيماني...',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.7),
+                            fontSize: 14,
+                            fontFamily: 'Tajawal',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
-  }
-
-  List<Widget> _buildBackgroundCircles() {
-    return List.generate(5, (index) {
-      final size = 100.0 + (index * 60);
-      final opacity = 0.08 - (index * 0.01);
-      return Positioned(
-        left: (index * 50) % 300,
-        top: (index * 100) % 600,
-        child: Opacity(
-          opacity: opacity * _controller.value,
-          child: Container(
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white.withOpacity(0.1),
-            ),
-          ),
-        ),
-      );
-    });
   }
 }

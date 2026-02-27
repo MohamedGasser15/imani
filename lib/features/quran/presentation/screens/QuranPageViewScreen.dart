@@ -24,7 +24,7 @@ class _QuranPageViewScreenState extends State<QuranPageViewScreen> {
     final quranProvider = Provider.of<QuranProvider>(context, listen: false);
     _currentPage = quranProvider.lastReadPage;
     _pageController = PageController(initialPage: _currentPage - 1);
-    _updatePageInfo(_currentPage);
+    _updatePageInfoFromCurrentPage(quranProvider);
   }
 
   @override
@@ -38,13 +38,21 @@ class _QuranPageViewScreenState extends State<QuranPageViewScreen> {
     _isZoomedNotifier.value = isZoomed;
   }
 
+  void _updatePageInfoFromCurrentPage(QuranProvider provider) {
+    if (provider.currentPageAyahs != null && provider.currentPageAyahs!.isNotEmpty) {
+      setState(() {
+        _currentSurahName = _getSurahName(provider.currentPageAyahs!.first.surahNumber);
+        _currentJuz = provider.currentPageAyahs!.first.juz;
+      });
+    }
+  }
+
   Future<void> _updatePageInfo(int pageNumber) async {
     final quranProvider = Provider.of<QuranProvider>(context, listen: false);
-    final ayahs = await quranProvider.getPage(pageNumber);
-    if (ayahs.isNotEmpty) {
+    if (quranProvider.currentPageAyahs != null && quranProvider.currentPageAyahs!.isNotEmpty) {
       setState(() {
-        _currentSurahName = _getSurahName(ayahs.first.surahNumber);
-        _currentJuz = ayahs.first.juz;
+        _currentSurahName = _getSurahName(quranProvider.currentPageAyahs!.first.surahNumber);
+        _currentJuz = quranProvider.currentPageAyahs!.first.juz;
       });
     }
   }
@@ -52,13 +60,6 @@ class _QuranPageViewScreenState extends State<QuranPageViewScreen> {
   @override
   Widget build(BuildContext context) {
     final quranProvider = Provider.of<QuranProvider>(context);
-    final totalPages = quranProvider.totalPages;
-
-    if (totalPages == 0) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5EBDD),
@@ -79,34 +80,49 @@ class _QuranPageViewScreenState extends State<QuranPageViewScreen> {
               physics: isZoomed
                   ? const NeverScrollableScrollPhysics()
                   : const PageScrollPhysics(),
-              itemCount: totalPages,
-              onPageChanged: (index) {
+              itemCount: quranProvider.totalPages,
+              onPageChanged: (index) async {
                 final newPage = index + 1;
                 setState(() {
                   _currentPage = newPage;
                 });
-                quranProvider.saveLastPage(newPage);
+                await quranProvider.goToPage(newPage);
                 _updatePageInfo(newPage);
               },
               itemBuilder: (context, index) {
                 final pageNumber = index + 1;
-                return FutureBuilder<List<Ayah>>(
-                  future: quranProvider.getPage(pageNumber),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(child: Text('لا توجد آيات'));
-                    }
-                    final ayahs = snapshot.data!;
-                    return QuranPageWidget(
-                      pageNumber: pageNumber,
-                      ayahs: ayahs,
-                      onZoomStateChanged: _onZoomStateChanged,
-                    );
-                  },
-                );
+                // إذا كانت هذه هي الصفحة الحالية، استخدم currentPageAyahs
+                if (pageNumber == quranProvider.lastReadPage) {
+                  if (quranProvider.isLoadingPage) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (quranProvider.currentPageAyahs == null || quranProvider.currentPageAyahs!.isEmpty) {
+                    return const Center(child: Text('لا توجد آيات'));
+                  }
+                  return QuranPageWidget(
+                    pageNumber: pageNumber,
+                    ayahs: quranProvider.currentPageAyahs!,
+                    onZoomStateChanged: _onZoomStateChanged,
+                  );
+                } else {
+                  // للصفحات الأخرى، استخدم FutureBuilder
+                  return FutureBuilder<List<Ayah>>(
+                    future: quranProvider.getPage(pageNumber),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Center(child: Text('لا توجد آيات'));
+                      }
+                      return QuranPageWidget(
+                        pageNumber: pageNumber,
+                        ayahs: snapshot.data!,
+                        onZoomStateChanged: _onZoomStateChanged,
+                      );
+                    },
+                  );
+                }
               },
             );
           },
@@ -185,7 +201,6 @@ class _QuranPageViewScreenState extends State<QuranPageViewScreen> {
   }
 
   String _getSurahName(int surahNumber) {
-    // استبدل هذه القائمة بأسماء السور الكاملة
     const surahNames = {
       1: 'الفاتحة',
       2: 'البقرة',
@@ -195,6 +210,8 @@ class _QuranPageViewScreenState extends State<QuranPageViewScreen> {
     return surahNames[surahNumber] ?? 'سورة';
   }
 }
+
+// ==================== QuranPageWidget ====================
 
 class QuranPageWidget extends StatefulWidget {
   final int pageNumber;
@@ -258,29 +275,28 @@ class _QuranPageWidgetState extends State<QuranPageWidget> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // اسم السورة (إذا كانت بداية سورة)
             if (_isStartOfSurah(firstAyah))
               _buildSurahTitle(_getSurahName(firstAyah.surahNumber)),
             if (_isStartOfSurah(firstAyah)) ...[
               const SizedBox(height: 8),
-              // عرض أول آية كعنوان مميز
               Text(
                 firstAyah.text.replaceAll(RegExp(r'[\u0600-\u06FF\s]'), ''),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'UthmanicHafs',
-                  fontSize: settings.quranFontSize * 1.2,
+                  // تقليل حجم خط البسملة (كان *1.2)
+                  fontSize: settings.quranFontSize * 1.0,
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFF8B5E3C),
-                  height: 2.0,
+                  // تقليل المسافة بين الأسطر
+                  height: 1.4,
                 ),
               ),
               const SizedBox(height: 16),
             ],
-            // الآيات
             Expanded(
               child: SingleChildScrollView(
-                physics: _isZoomed ? const AlwaysScrollableScrollPhysics() : const NeverScrollableScrollPhysics(),
+                physics: const AlwaysScrollableScrollPhysics(), // تمرير دائم
                 child: RichText(
                   textAlign: TextAlign.justify,
                   textDirection: TextDirection.rtl,
@@ -312,7 +328,8 @@ class _QuranPageWidgetState extends State<QuranPageWidget> {
             'سورة $surahName',
             style: const TextStyle(
               fontFamily: 'UthmanicHafs',
-              fontSize: 28,
+              // تقليل حجم خط عنوان السورة (كان 28)
+              fontSize: 24,
               color: Color(0xFF8B5E3C),
             ),
           ),
@@ -321,72 +338,64 @@ class _QuranPageWidgetState extends State<QuranPageWidget> {
     );
   }
 
-  List<InlineSpan> _buildAyahSpans(List<Ayah> ayahs, double fontSize) {
-    List<InlineSpan> spans = [];
-    final double ayahFontSize = fontSize * 1.5;
+List<InlineSpan> _buildAyahSpans(List<Ayah> ayahs, double fontSize) {
+  List<InlineSpan> spans = [];
+  final double ayahFontSize = fontSize * 1.3; // تكبير الخط من settings
+  for (var ayah in ayahs) {
+    // تنظيف النص من علامات غير مرغوبة
+    String withoutMarker = ayah.text.replaceAll(RegExp(r'\u06DD'), '');
+    String cleanedText = withoutMarker.replaceAllMapped(
+      RegExp(r'[\u0660-\u0669\u06F0-\u06F9]'),
+      (match) => '',
+    );
 
-    for (var ayah in ayahs) {
-      String withoutMarker = ayah.text.replaceAll(RegExp(r'\u06DD'), '');
-      String ayahText = ayah.text;
-      String cleanedText = withoutMarker.replaceAllMapped(
-        RegExp(r'[\u0660-\u0669\u06F0-\u06F9]'),
-        (match) => '',
-      );
+    cleanedText = cleanedText.replaceAllMapped(
+      RegExp(
+        r'[\u0600\u0601\u0602\u0603\u0604\u0605\u0606\u0607\u0608\u0609\u060A\u060B\u060C\u060D\u060E' +
+        r'\u060F\u0610\u0611\u0612\u0613\u0614\u0615\u0616\u0617\u0618\u0619\u061A\u061B\u061C\u061D' +
+        r'\u061E\u061F\u0620\u063B-\u063F\u0658-\u065F\u066A-\u066F\u0672-\u06FF]'
+      ),
+      (match) => '',
+    );
 
-      cleanedText = cleanedText.replaceAllMapped(
-        RegExp(
-          r'[\u0600\u0601\u0602\u0603\u0604\u0605\u0606\u0607\u0608\u0609\u060A\u060B\u060C\u060D\u060E' +
-          r'\u060F\u0610\u0611\u0612\u0613\u0614\u0615\u0616\u0617\u0618\u0619\u061A\u061B\u061C\u061D' +
-          r'\u061E\u061F\u0620\u063B\u063C\u063D\u063E\u063F\u0658\u0659\u065A\u065B\u065C\u065D\u065F' +
-          r'\u066A\u066B\u066C\u066D\u066F\u0672\u0673\u0674\u0675\u0676\u0677\u0678\u0679\u067A\u067B' +
-          r'\u067C\u067D\u067E\u067F\u0680\u0681\u0682\u0683\u0684\u0685\u0686\u0687\u0688\u0689\u068A' +
-          r'\u068B\u068C\u068D\u068E\u068F\u0690\u0691\u0692\u0693\u0694\u0695\u0696\u0697\u0698\u0699' +
-          r'\u069A\u069B\u069C\u069D\u069E\u069F\u06A0\u06A1\u06A2\u06A3\u06A4\u06A5\u06A6\u06A7\u06A8' +
-          r'\u06A9\u06AA\u06AB\u06AC\u06AD\u06AE\u06AF\u06B0\u06B1\u06B2\u06B3\u06B4\u06B5\u06B6\u06B7' +
-          r'\u06B8\u06B9\u06BA\u06BB\u06BC\u06BD\u06BE\u06BF\u06C0\u06C1\u06C2\u06C3\u06C4\u06C5\u06C6' +
-          r'\u06C7\u06C8\u06C9\u06CA\u06CB\u06CC\u06CD\u06CE\u06CF\u06D0\u06D1\u06D2\u06D3\u06D4\u06D5' +
-          r'\u06DF\u06E3\u06EB\u06EE\u06EF\u06F0\u06F1\u06F2\u06F3\u06F4\u06F5\u06F6\u06F7\u06F8\u06F9' +
-          r'\u06FA\u06FB\u06FC\u06FD\u06FE\u06FF]'
-        ),
-        (match) => '',
-      );
+    cleanedText = cleanedText.replaceAllMapped(
+      RegExp(r'[\u0600-\u06FF]'),
+      (match) => match[0]!,
+    );
 
-      ayahText = ayahText.replaceAll(RegExp(r'\u06DD'), '');
-      
-      if (ayah.numberInSurah == 1 && ayah.surahNumber != 9) {
-        ayahText = 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ ' + ayahText;
-      }
-      
-      spans.add(
-        TextSpan(
-          text: "$cleanedText",
-          style: TextStyle(
-            fontFamily: 'UthmanicHafs',
-            fontSize: ayahFontSize,
-            height: 2.0,
-            color: Colors.black,
-          ),
-        ),
-      );
-
-      // إضافة رقم الآية بدون أقواس
-      spans.add(
-        WidgetSpan(
-          alignment: PlaceholderAlignment.middle,
-          child: AyahNumberWidget(
-            number: ayah.numberInSurah,
-            fontSize: ayahFontSize * 0.8,
-          ),
-        ),
-      );
-print("API TEXT => ${ayah.text}");
-      spans.add(const TextSpan(text: " "));
+    // إضافة البسملة للآية الأولى إذا مش سورة التوبة
+    if (ayah.numberInSurah == 1 && ayah.surahNumber != 9) {
+      cleanedText = 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ ' + cleanedText;
     }
 
-    return spans;
-  }
+    // النص الأساسي
+    spans.add(
+      TextSpan(
+        text: cleanedText,
+        style: TextStyle(
+          fontFamily: 'UthmanicHafs',
+          fontSize: ayahFontSize,
+          height: 1.4, // المسافات بين السطور
+          color: Colors.black,
+        ),
+      ),
+    );
 
-  String _getSurahName(int surahNumber) {
+    // رقم الآية
+    spans.add(
+      WidgetSpan(
+        alignment: PlaceholderAlignment.middle,
+        child: AyahNumberWidget(
+          number: ayah.numberInSurah,
+          fontSize: ayahFontSize * 0.8, // مناسب لحجم النص
+        ),
+      ),
+    );
+
+    spans.add(const TextSpan(text: " "));
+  }
+  return spans;
+}  String _getSurahName(int surahNumber) {
     const surahNames = {
       1: 'الفاتحة',
       2: 'البقرة',
@@ -401,7 +410,8 @@ print("API TEXT => ${ayah.text}");
   }
 }
 
-// عنصر رقم الآية بدون دائرة وبدون أقواس
+// ==================== AyahNumberWidget ====================
+
 class AyahNumberWidget extends StatelessWidget {
   final int number;
   final double fontSize;
@@ -413,7 +423,7 @@ class AyahNumberWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Text(
-        _toArabicNumber(number), // بدون أقواس
+        _toArabicNumber(number),
         style: TextStyle(
           fontFamily: 'UthmanicHafs',
           fontSize: fontSize,
