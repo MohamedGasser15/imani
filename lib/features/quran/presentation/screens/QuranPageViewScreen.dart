@@ -275,28 +275,20 @@ class _QuranPageWidgetState extends State<QuranPageWidget> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // عنوان السورة إذا كانت بداية سورة
             if (_isStartOfSurah(firstAyah))
               _buildSurahTitle(_getSurahName(firstAyah.surahNumber)),
-            if (_isStartOfSurah(firstAyah)) ...[
-              const SizedBox(height: 8),
-              Text(
-                firstAyah.text.replaceAll(RegExp(r'[\u0600-\u06FF\s]'), ''),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'UthmanicHafs',
-                  // تقليل حجم خط البسملة (كان *1.2)
-                  fontSize: settings.quranFontSize * 1.0,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF8B5E3C),
-                  // تقليل المسافة بين الأسطر
-                  height: 1.4,
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
+
+            // البسملة (فقط للآية الأولى وليست سورة التوبة)
+            if (_isStartOfSurah(firstAyah) && firstAyah.surahNumber != 9)
+              _buildBasmala(settings.quranFontSize),
+
+            const SizedBox(height: 16),
+
+            // نص الآيات
             Expanded(
               child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(), // تمرير دائم
+                physics: const AlwaysScrollableScrollPhysics(),
                 child: RichText(
                   textAlign: TextAlign.justify,
                   textDirection: TextDirection.rtl,
@@ -313,89 +305,150 @@ class _QuranPageWidgetState extends State<QuranPageWidget> {
     );
   }
 
-  Widget _buildSurahTitle(String surahName) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE8D9C5),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Text(
+  // دالة بناء عنوان السورة (كما هي)
+Widget _buildSurahTitle(String surahName) {
+  final width = MediaQuery.of(context).size.width;
+
+  return Container(
+    margin: const EdgeInsets.symmetric(vertical: 15),
+    child: Stack(
+      alignment: Alignment.center,
+      children: [
+        Image.asset(
+          'assets/images/surah_frame.png',
+          width: width,
+          fit: BoxFit.fitWidth,
+        ),
+        Positioned(
+          bottom: width * 0.02,
+          child:  Text(
             'سورة $surahName',
             style: const TextStyle(
               fontFamily: 'UthmanicHafs',
-              // تقليل حجم خط عنوان السورة (كان 28)
               fontSize: 24,
               color: Color(0xFF8B5E3C),
             ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 
-List<InlineSpan> _buildAyahSpans(List<Ayah> ayahs, double fontSize) {
-  List<InlineSpan> spans = [];
-  final double ayahFontSize = fontSize * 1.3; // تكبير الخط من settings
-  for (var ayah in ayahs) {
-    // تنظيف النص من علامات غير مرغوبة
-    String withoutMarker = ayah.text.replaceAll(RegExp(r'\u06DD'), '');
-    String cleanedText = withoutMarker.replaceAllMapped(
-      RegExp(r'[\u0660-\u0669\u06F0-\u06F9]'),
-      (match) => '',
-    );
-
-    cleanedText = cleanedText.replaceAllMapped(
-      RegExp(
-        r'[\u0600\u0601\u0602\u0603\u0604\u0605\u0606\u0607\u0608\u0609\u060A\u060B\u060C\u060D\u060E' +
-        r'\u060F\u0610\u0611\u0612\u0613\u0614\u0615\u0616\u0617\u0618\u0619\u061A\u061B\u061C\u061D' +
-        r'\u061E\u061F\u0620\u063B-\u063F\u0658-\u065F\u066A-\u066F\u0672-\u06FF]'
-      ),
-      (match) => '',
-    );
-
-    cleanedText = cleanedText.replaceAllMapped(
-      RegExp(r'[\u0600-\u06FF]'),
-      (match) => match[0]!,
-    );
-
-    // إضافة البسملة للآية الأولى إذا مش سورة التوبة
-    if (ayah.numberInSurah == 1 && ayah.surahNumber != 9) {
-      cleanedText = 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ ' + cleanedText;
-    }
-
-    // النص الأساسي
-    spans.add(
-      TextSpan(
-        text: cleanedText,
+  // ✅ دالة جديدة لبناء البسملة
+  Widget _buildBasmala(double baseFontSize) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Text(
+        'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+        textAlign: TextAlign.center,
         style: TextStyle(
           fontFamily: 'UthmanicHafs',
-          fontSize: ayahFontSize,
-          height: 1.4, // المسافات بين السطور
-          color: Colors.black,
+          fontSize: baseFontSize * 1.2, // أكبر قليلاً من حجم الآيات
+          fontWeight: FontWeight.bold,
+          color: const Color(0xFF8B5E3C),
+          height: 1.4,
         ),
       ),
     );
-
-    // رقم الآية
-    spans.add(
-      WidgetSpan(
-        alignment: PlaceholderAlignment.middle,
-        child: AyahNumberWidget(
-          number: ayah.numberInSurah,
-          fontSize: ayahFontSize * 0.8, // مناسب لحجم النص
-        ),
-      ),
-    );
-
-    spans.add(const TextSpan(text: " "));
   }
-  return spans;
-}  String _getSurahName(int surahNumber) {
+
+  // دالة بناء الـ Spans (مع دالة إزالة البسملة الذكية)
+  List<InlineSpan> _buildAyahSpans(List<Ayah> ayahs, double fontSize) {
+    List<InlineSpan> spans = [];
+    final double ayahFontSize = fontSize * 1.3;
+
+    for (var ayah in ayahs) {
+      String originalText = ayah.text;
+      
+      // تنظيف النص من الرموز الخاصة (كما كانت)
+      String withoutMarker = originalText.replaceAll(RegExp(r'\u06DD'), '');
+      String cleanedText = withoutMarker.replaceAllMapped(
+        RegExp(r'[\u0660-\u0669\u06F0-\u06F9]'),
+        (match) => '',
+      );
+
+      cleanedText = cleanedText.replaceAllMapped(
+        RegExp(
+          r'[\u0600\u0601\u0602\u0603\u0604\u0605\u0606\u0607\u0608\u0609\u060A\u060B\u060C\u060D\u060E' +
+          r'\u060F\u0610\u0611\u0612\u0613\u0614\u0615\u0616\u0617\u0618\u0619\u061A\u061B\u061C\u061D' +
+          r'\u061E\u061F\u0620\u063B-\u063F\u0658-\u065F\u066A-\u066F\u0672-\u06FF]'
+        ),
+        (match) => '',
+      );
+
+      cleanedText = cleanedText.replaceAllMapped(
+        RegExp(r'[\u0600-\u06FF]'),
+        (match) => match[0]!,
+      );
+
+      // إزالة البسملة من الآية الأولى فقط (باستخدام الدالة الذكية)
+      if (ayah.numberInSurah == 1 && ayah.surahNumber != 9) {
+        cleanedText = _removeBasmalaSmart(cleanedText);
+      }
+
+      // إضافة النص
+      spans.add(
+        TextSpan(
+          text: cleanedText,
+          style: TextStyle(
+            fontFamily: 'UthmanicHafs',
+            fontSize: ayahFontSize,
+            height: 1.4,
+            color: Colors.black,
+          ),
+        ),
+      );
+
+      // رقم الآية
+      spans.add(
+        WidgetSpan(
+          alignment: PlaceholderAlignment.middle,
+          child: AyahNumberWidget(
+            number: ayah.numberInSurah,
+            fontSize: ayahFontSize * 0.8,
+          ),
+        ),
+      );
+
+      spans.add(const TextSpan(text: " "));
+    }
+    return spans;
+  }
+
+  // دالة إزالة البسملة الذكية (اللي اشتغلنا عليها)
+  String _removeBasmalaSmart(String text) {
+    String normalizeForCompare(String s) {
+      return s.replaceAll(RegExp(r'[\u0610-\u061A\u064B-\u065F\u0670]'), '')
+              .replaceAll('ٱ', 'ا')
+              .replaceAll('إ', 'ا')
+              .replaceAll('أ', 'ا')
+              .replaceAll('آ', 'ا');
+    }
+
+    String normalizedText = normalizeForCompare(text);
+    const normalizedBasmala = 'بسم الله الرحمن الرحيم';
+
+    if (normalizedText.startsWith(normalizedBasmala)) {
+      int basmalaLength = 0;
+      for (int i = 1; i <= text.length; i++) {
+        String prefix = text.substring(0, i);
+        String normalizedPrefix = normalizeForCompare(prefix);
+        if (normalizedBasmala.startsWith(normalizedPrefix)) {
+          basmalaLength = i;
+        } else {
+          break;
+        }
+      }
+      if (basmalaLength > 0) {
+        return text.substring(basmalaLength).trimLeft();
+      }
+    }
+    return text;
+  }
+
+  // دوال مساعدة (موجودة بالفعل)
+  String _getSurahName(int surahNumber) {
     const surahNames = {
       1: 'الفاتحة',
       2: 'البقرة',
@@ -409,7 +462,6 @@ List<InlineSpan> _buildAyahSpans(List<Ayah> ayahs, double fontSize) {
     return ayah.numberInSurah == 1;
   }
 }
-
 // ==================== AyahNumberWidget ====================
 
 class AyahNumberWidget extends StatelessWidget {
