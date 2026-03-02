@@ -7,14 +7,14 @@ class QuranProvider extends ChangeNotifier {
   final QuranRepository _repository = QuranRepository();
 
   int _lastReadPage = 1;
-  List<Ayah>? _currentPageAyahs;
   bool _isLoadingPage = false;
   String? _error;
-  final int _totalPages = 604; // عدد صفحات المصحف ثابت
+  final int _totalPages = 604;
 
-  // Getters
+  // Cache للصفحات في الذاكرة
+  final Map<int, List<Ayah>> _pageCache = {};
+
   int get lastReadPage => _lastReadPage;
-  List<Ayah>? get currentPageAyahs => _currentPageAyahs;
   bool get isLoadingPage => _isLoadingPage;
   String? get error => _error;
   int get totalPages => _totalPages;
@@ -23,10 +23,8 @@ class QuranProvider extends ChangeNotifier {
     _init();
   }
 
-  // دالة تهيئة عامة (تُستدعى من SplashScreen)
   Future<void> initialize() async {
-    // إذا كانت الصفحة الحالية محملة بالفعل، لا تفعل شيئاً
-    if (_currentPageAyahs != null) return;
+    if (_pageCache.containsKey(_lastReadPage)) return;
     await _init();
   }
 
@@ -48,33 +46,43 @@ class QuranProvider extends ChangeNotifier {
     await prefs.setInt('lastReadPage', page);
   }
 
+  /// الحصول على صفحة من الكاش (إن وجدت)
+  List<Ayah>? getCachedPage(int pageNumber) {
+    return _pageCache[pageNumber];
+  }
+
+  /// تحميل صفحة وتخزينها في الكاش
   Future<void> loadPage(int pageNumber) async {
     if (pageNumber < 1 || pageNumber > _totalPages) return;
+    if (_pageCache.containsKey(pageNumber)) return; // موجودة بالفعل
 
     _isLoadingPage = true;
     _error = null;
     notifyListeners();
 
     try {
-      _currentPageAyahs = await _repository.getPage(pageNumber);
-      if (pageNumber != _lastReadPage) {
-        await saveLastPage(pageNumber);
-      }
+      final ayahs = await _repository.getPage(pageNumber);
+      _pageCache[pageNumber] = ayahs;
     } catch (e) {
       _error = e.toString();
-      _currentPageAyahs = null;
     } finally {
       _isLoadingPage = false;
-      notifyListeners();
+      notifyListeners(); // يُعلم فقط أن صفحة معينة اكتمل تحميلها
     }
   }
 
+  /// الانتقال إلى صفحة محددة
   Future<void> goToPage(int pageNumber) async {
     if (pageNumber < 1 || pageNumber > _totalPages) return;
+    if (pageNumber == _lastReadPage) return;
+
+    await saveLastPage(pageNumber);
     await loadPage(pageNumber);
     _repository.startBackgroundLoading(pageNumber);
+    notifyListeners(); // لتحديث الصفحة الحالية في الـ Header
   }
 
+  // دوال إضافية
   Future<List<Ayah>> getPage(int pageNumber) {
     return _repository.getPage(pageNumber);
   }
