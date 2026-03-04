@@ -464,13 +464,6 @@ class _QuranPageViewScreenState extends State<QuranPageViewScreen>
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: const Color(0xFFF5EBDD),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -654,7 +647,7 @@ class _QuranPageWidgetState extends State<QuranPageWidget> {
       scaleEnabled: true,
       child: Container(
         color: const Color(0xFFF5EBDD),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -663,7 +656,6 @@ class _QuranPageWidgetState extends State<QuranPageWidget> {
               _buildSurahTitle(_getSurahName(firstAyah.surahNumber)),
             if (_isStartOfSurah(firstAyah) && firstAyah.surahNumber != 9)
               _buildBasmala(settings.quranFontSize),
-            const SizedBox(height: 16),
             Expanded(
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -727,65 +719,68 @@ class _QuranPageWidgetState extends State<QuranPageWidget> {
     );
   }
 
-  List<InlineSpan> _buildAyahSpans(List<Ayah> ayahs, double fontSize) {
-    List<InlineSpan> spans = [];
-    final double ayahFontSize = fontSize * 1.3;
+List<InlineSpan> _buildAyahSpans(List<Ayah> ayahs, double fontSize) {
+  List<InlineSpan> spans = [];
+  final double ayahFontSize = fontSize * 1.3;
 
-    for (var ayah in ayahs) {
-      String originalText = ayah.text;
+  for (var ayah in ayahs) {
+    String originalText = ayah.text;
 
-      // تنظيف النص (كما في الكود الأصلي)
-      String withoutMarker = originalText.replaceAll(RegExp(r'\u06DD'), '');
-      String cleanedText = withoutMarker.replaceAllMapped(
-        RegExp(r'[\u0660-\u0669\u06F0-\u06F9]'),
-        (match) => '',
-      );
+    // تنظيف النص (كما في الكود الأصلي)
+    String withoutMarker = originalText.replaceAll(RegExp(r'\u06DD'), '');
+    String cleanedText = withoutMarker.replaceAllMapped(
+      RegExp(r'[\u0660-\u0669\u06F0-\u06F9]'),
+      (match) => '',
+    );
 
-      cleanedText = cleanedText.replaceAllMapped(
-        RegExp(
-          r'[\u0600\u0601\u0602\u0603\u0604\u0605\u0606\u0607\u0608\u0609\u060A\u060B\u060C\u060D\u060E' +
-              r'\u060F\u0610\u0611\u0612\u0613\u0614\u0615\u0616\u0617\u0618\u0619\u061A\u061B\u061C\u061D' +
-              r'\u061E\u061F\u0620\u063B-\u063F\u0658-\u065F\u066A-\u066F\u0672-\u06FF]',
-        ),
-        (match) => '',
-      );
+    cleanedText = cleanedText.replaceAllMapped(
+      RegExp(
+        r'[\u0600\u0601\u0602\u0603\u0604\u0605\u0606\u0607\u0608\u0609\u060A\u060B\u060C\u060D\u060E' +
+            r'\u060F\u0610\u0611\u0612\u0613\u0614\u0615\u0616\u0617\u0618\u0619\u061A\u061B\u061C\u061D' +
+            r'\u061E\u061F\u0620\u063B-\u063F\u0658-\u065F\u066A-\u066F\u0672-\u06FF]',
+      ),
+      (match) => '',
+    );
 
-      cleanedText = cleanedText.replaceAllMapped(
-        RegExp(r'[\u0600-\u06FF]'),
-        (match) => match[0]!,
-      );
-
-      if (ayah.numberInSurah == 1 && ayah.surahNumber != 9) {
-        cleanedText = _removeBasmalaSmart(cleanedText);
-      }
-
-      spans.add(
-        TextSpan(
-          text: cleanedText,
-          style: TextStyle(
-            fontFamily: 'UthmanicHafs',
-            fontSize: ayahFontSize,
-            height: 1.5,
-            color: Colors.black,
-          ),
-        ),
-      );
-
-      spans.add(
-        WidgetSpan(
-          alignment: PlaceholderAlignment.middle,
-          child: AyahNumberWidget(
-            number: ayah.numberInSurah,
-            fontSize: ayahFontSize * 0.8,
-          ),
-        ),
-      );
-
-      spans.add(const TextSpan(text: " "));
+    cleanedText = cleanedText.replaceAllMapped(
+      RegExp(r'[\u0600-\u06FF]'),
+      (match) => match[0]!,
+    );
+cleanedText = cleanedText.replaceAll(' ', '\u200A\u200A\u200A');
+    if (ayah.numberInSurah == 1 && ayah.surahNumber != 9) {
+      cleanedText = _removeBasmalaSmart(cleanedText);
     }
-    return spans;
-  }
 
+    spans.add(
+      TextSpan(
+        text: cleanedText,
+        style: TextStyle(
+          fontFamily: 'UthmanicHafs',
+          fontSize: ayahFontSize,
+          height: 1.3,
+          color: Colors.black, // لون أسود خالص
+          letterSpacing: 0.0, // تقليل المسافة بين الحروف/الكلمات
+        ),
+      ),
+    );
+
+spans.add(
+  WidgetSpan(
+    alignment: PlaceholderAlignment.middle,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 1.0), // مسافة 1 بكسل على الجانبين
+      child: AyahNumberWidget(
+        number: ayah.numberInSurah,
+        fontSize: ayahFontSize * 1.0,
+      ),
+    ),
+  ),
+);
+
+    spans.add(WidgetSpan(child: SizedBox(width:1))); // مسافة 4 بكسل
+  }
+  return spans;
+}
   String _removeBasmalaSmart(String text) {
     String normalizeForCompare(String s) {
       return s
@@ -843,15 +838,12 @@ class AyahNumberWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: Text(
-        _toArabicNumber(number),
-        style: TextStyle(
-          fontFamily: 'UthmanicHafs',
-          fontSize: fontSize,
-          color: const Color(0xFF8B5E3C),
-        ),
+    return Text(
+      _toArabicNumber(number),
+      style: TextStyle(
+        fontFamily: 'UthmanicHafs',
+        fontSize: fontSize,
+        color: const Color(0xFF8B5E3C),
       ),
     );
   }
