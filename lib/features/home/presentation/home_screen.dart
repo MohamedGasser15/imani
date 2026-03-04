@@ -18,7 +18,13 @@ class _HomeScreenState extends State<HomeScreen> {
   late final List<Widget> _pages = [
     const HomeTab(),
     const DiscoverTab(),
-    const QuranTab(), // هذا التبويب يستخدم QuranPageScreen
+     QuranTab(
+    onBackPressed: () {
+      setState(() {
+        _selectedIndex = 0; // العودة إلى التبويب الرئيسي (HomeTab)
+      });
+    },
+  ), // هذا التبويب يستخدم QuranPageScreen
     const PrayerTab(),
     const ProfileTab(),
   ];
@@ -85,11 +91,15 @@ class DiscoverTab extends StatelessWidget {
 
 // داخل class QuranTab في home_screen.dart
 class QuranTab extends StatelessWidget {
-  const QuranTab({super.key});
+  final VoidCallback onBackPressed;
+
+  const QuranTab({super.key, required this.onBackPressed});
 
   @override
   Widget build(BuildContext context) {
-    return const QuranPageViewScreen(); // استبدال SurahListScreen
+    return QuranPageViewScreen(
+      onBackPressed: onBackPressed, // تمرير الدالة
+    );
   }
 }
 class PrayerTab extends StatelessWidget {
